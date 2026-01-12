@@ -241,7 +241,11 @@ mxsure_estimate <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist=
                                                                                  #         mu = tree_fulldist_mu,
                                                                                  #         size = tree_fulldist_size,
                                                                                  #         log=TRUE)
+<<<<<<< HEAD
                                                                                  dlogpoissongamma(..3 + ..5, ..4 + ..5, ..2,intercept, lambda, alpha, beta)
+=======
+                                                                                 dlogpoissongamma(..3, ..4, ..2,intercept, lambda, alpha, beta)
+>>>>>>> 240d420d1868716864aa4324ca2cb7d6c6d30792
                                                                                # -
                                                                                #     ppois(right_truncation,
                                                                                #           lambda =  lambda*..2 + intercept,
