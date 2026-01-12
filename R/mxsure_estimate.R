@@ -357,7 +357,11 @@ mxsure_estimate <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist=
           nb_size=nb_fit$estimate["size"],
           nb_mu=nb_fit$estimate["mu"],
           tree_fulldist_param = result$par[[7]],
+<<<<<<< HEAD
           intercept3 = result$par[[8]]
+=======
+          intercept2 = result$par[[8]]
+>>>>>>> 2a2a0a92da5e26a2f4cd96a39b3eeb14ad9faada
 
 
         )
