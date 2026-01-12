@@ -185,8 +185,8 @@ mxsure_estimate <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist=
         dlogpoissongamma <- function(n1, n2, dt, intercept, lambda, alpha, beta) {
           # Log of the constant term
           log_const <- (n1 + n2) * log(lambda) +
-            - intercept +
-            (n2) * log(intercept) +
+           # - intercept +
+           # (n2) * log(intercept) +
             alpha * log(beta) -
             lambda * ( dt)  -
             lfactorial(n1) -
