@@ -109,7 +109,8 @@ mxsure_ci <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist=NA, mi
 
 
   bootstrapresults <- raw_bootstrapresults[complete.cases(raw_bootstrapresults), ] #removes failed results from optimisation failures
-  bootstrapresults <- bootstrapresults[1:5]
+  bootstrapresults <- bootstrapresults %>%
+    select(where(is.numeric))
 
   lowerres <- bootstrapresults|> #finds quantiles for confidence intervals
     summarise(across(everything(),  ~quantile(.x, 1-confidence_level, na.rm=TRUE)))
