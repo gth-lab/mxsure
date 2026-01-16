@@ -82,7 +82,9 @@ mxsure_ci <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist=NA, mi
         lambda_bounds = lambda_bounds, k_bounds=k_bounds,  intercept_bounds=intercept_bounds,
         tree_fulldist_param_bounds = tree_fulldist_param_bounds)
   , classes = "warning")
-  start_params <- as.numeric(c(test_result[3], test_result[2], test_result[4], test_result[7], test_result[8]))
+  if(!anyNA(tree)|!anyNA(sampleA)|!anyNA(sampleB)){
+  start_params <- as.numeric(c(test_result[3], test_result[2], test_result[6], test_result[7]))
+  }else{start_params <- as.numeric(c(test_result[3], test_result[2], test_result[4]))}
     }
 
 

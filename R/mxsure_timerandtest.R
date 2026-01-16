@@ -97,7 +97,9 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
     original_ci <- mxsure_ci(original_data$snp_dist,unrelated_snp_dist, original_data$time_dist,original_data$sites, right_truncation=right_truncation, quiet=quiet,
                              tree=tree, sampleA=sampleA, sampleB=sampleB,branch_offset=branch_offset,
                                         bootstraps=bootstraps, confidence_level=confidence_level,
-                                       start_params = c(original_result[3], original_result[2], original_result[4], original_result[7], original_result[8]),
+                                       start_params = ifelse(!anyNA(tree)|!anyNA(sampleA)|!anyNA(sampleB),
+                                                             c(original_result[3], original_result[2],original_result[6], original_result[7]),
+                                                             c(original_result[3], original_result[2], original_result[4])),
                              lambda_bounds = lambda_bounds, k_bounds=k_bounds, intercept_bounds=intercept_bounds)
   } else{
     original_ci <- ci_data
@@ -120,6 +122,15 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
     if(!quiet){print(paste0("Processing Permutation: ", i))}
 
       timerand_data <- tibble(snp_dist=mixed_snp_dist, time_dist=sample(mixed_time_dist, length(mixed_time_dist)), sites=mixed_sites)
+
+      if(!anyNA(sampleA)|!anyNA(sampleB)){ #shuffling sample A and sample B id's around randomly
+        p <- sample.int(2, replace=TRUE, size=length(sampleA))
+
+        timerand_sampleA <- ifelse(p==1, sampleA, sampleB)
+        timerand_sampleB <- ifelse(p==2, sampleA, sampleB)
+        sampleA <- timerand_sampleA
+        sampleB <- timerand_sampleB
+      }
 
     if(!anyNA(start_params)){
       if (any(start_params=="Efficient")){
