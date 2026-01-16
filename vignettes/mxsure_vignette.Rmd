@@ -63,7 +63,6 @@ MxSure in an R package designed to estimate substitution rates and infer SNP thr
 
 To demonstrate its use we can first simulate some example data using the `simulate_mixsnp_data()` command. Here we simulate 100 data points (each representing a pairwise SNP comparison between two sequences) with a true substitution rate of 5 SNPs/year with each data point having an 80% chance to be a related data point. By default sampling time differences for each of these data points are between 0 and 1 year.
 
-##
 
 ```{r setup}
 library(mxsure)

@@ -22,7 +22,7 @@
 #' @param quiet if true will not display progress bar
 #'
 #' @importFrom furrr future_map_dfr furrr_options
-#' @importFrom dplyr bind_rows summarise across everything slice_sample
+#' @importFrom dplyr bind_rows summarise across everything slice_sample select
 #' @importFrom tidyr tibble
 #' @importFrom stats complete.cases
 #'
