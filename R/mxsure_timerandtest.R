@@ -123,13 +123,15 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
 
       timerand_data <- tibble(snp_dist=mixed_snp_dist, time_dist=sample(mixed_time_dist, length(mixed_time_dist)), sites=mixed_sites)
 
+       timerand_sampleA <- sampleA
+       timerand_sampleB <- sampleB
+
       if(!anyNA(sampleA)|!anyNA(sampleB)){ #shuffling sample A and sample B id's around randomly
         p <- sample.int(2, replace=TRUE, size=length(sampleA))
 
         timerand_sampleA <- ifelse(p==1, sampleA, sampleB)
         timerand_sampleB <- ifelse(p==2, sampleA, sampleB)
-        sampleA <- timerand_sampleA
-        sampleB <- timerand_sampleB
+
       }
 
     if(!anyNA(start_params)){
@@ -143,7 +145,7 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
       }
 
   timerand_result <- mxsure_estimate(timerand_data$snp_dist,unrelated_snp_dist, timerand_data$time_dist, timerand_data$sites, right_truncation=right_truncation,
-                                     tree=tree, sampleA=sampleA, sampleB=sampleB,branch_offset=branch_offset,
+                                     tree=tree, sampleA=timerand_sampleA, sampleB=timerand_sampleB, branch_offset=branch_offset,
                                         lambda_bounds = lambda_bounds, k_bounds=k_bounds, intercept_bounds=intercept_bounds, start_params = start_params_timerand,  tree_fulldist_param_bounds = tree_fulldist_param_bounds)
 
   if(!anyNA(start_params)){
