@@ -133,7 +133,9 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
         timerand_sampleB <- ifelse(p==2, sampleA, sampleB)
 
         print(p)
+        print(sampleA)
         print(timerand_sampleA)
+        print(sampleB)
         print(timerand_sampleB)
         return()
       }
