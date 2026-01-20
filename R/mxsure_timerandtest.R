@@ -132,6 +132,10 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
         timerand_sampleA <- ifelse(p==1, sampleA, sampleB)
         timerand_sampleB <- ifelse(p==2, sampleA, sampleB)
 
+        print(p)
+        print(timerand_sampleA)
+        print(timerand_sampleB)
+        return()
       }
 
     if(!anyNA(start_params)){
@@ -150,15 +154,20 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
 
   if(!anyNA(start_params)){
   if (any(start_params=="Efficient")){
-    start_params_timerand <-as.numeric(c(timerand_result[3], timerand_result[2], timerand_result[4], timerand_result[7], timerand_result[8]))
+    if(!anyNA(tree)|!anyNA(sampleA)|!anyNA(sampleB)){
+      start_params_timerand <- as.numeric(c(timerand_result[3], timerand_result[2], timerand_result[6], timerand_result[7]))
+    }else{start_params_timerand <- as.numeric(c(timerand_result[3], timerand_result[2], timerand_result[4]))}
+
+
   }}
 
   timerand_ci <- mxsure_ci(timerand_data$snp_dist, unrelated_snp_dist, timerand_data$time_dist, timerand_data$sites,
                                         bootstraps=bootstraps, confidence_level=confidence_level, right_truncation=right_truncation,
-                           tree=tree, sampleA=timerand_sampleA, sampleB=timerand_sampleB,branch_offset=branch_offset,
+                              tree=tree, sampleA=timerand_sampleA, sampleB=timerand_sampleB, branch_offset=branch_offset,
                                        lambda_bounds = lambda_bounds, k_bounds=k_bounds, intercept_bounds=intercept_bounds
                                        ,start_params = start_params_timerand
                                        )
+
   if(failure_criterion=="above_estimate"){
   p_value_n <- sum(timerand_ci$raw_results$lambda>=original_result$lambda)
   }else if(failure_criterion=="within_ci"){
