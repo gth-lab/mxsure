@@ -165,7 +165,7 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
                                        ,start_params = start_params_timerand
                                        )
 
-  return(timerand_ci)
+
 
   if(failure_criterion=="above_estimate"){
   p_value_n <- sum(timerand_ci$raw_results$lambda>=original_result$lambda)
@@ -192,6 +192,8 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
   rawtimerand <- bind_rows(rawtimerand,
                            timerand_ci$raw_results %>% mutate(method = paste0("TR ", i)))
   }
+
+  return(timerand_ci)
 
   result$method <- factor(result$method, levels = result$method)
   rawtimerand$method <- factor(rawtimerand$method, levels = result$method)
