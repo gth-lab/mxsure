@@ -123,16 +123,18 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
 
       timerand_data <- tibble(snp_dist=mixed_snp_dist, time_dist=sample(mixed_time_dist, length(mixed_time_dist)), sites=mixed_sites)
 
+       sampleA <- as.character(sampleA)
+       sampleB <- as.character(sampleB)
+
        timerand_sampleA <- sampleA
        timerand_sampleB <- sampleB
 
       if(!anyNA(sampleA)|!anyNA(sampleB)){ #shuffling sample A and sample B id's around randomly
         p <- sample.int(2, replace=TRUE, size=length(sampleA))
 
-        timerand_sampleA <- ifelse(p==1, sampleA, sampleB)
-        timerand_sampleB <- ifelse(p==2, sampleA, sampleB)
+        timerand_sampleA <- dplyr::if_else(p==1, sampleA, sampleB)
+        timerand_sampleB <- dplyr::if_else(p==2, sampleA, sampleB)
 
-        return()
       }
 
     if(!anyNA(start_params)){
@@ -242,7 +244,6 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
   xres_timerand <- list(
     result=result,
     raw_results=rawtimerand,
-    timerand_ci=timerand_ci,
     outcome=outcome,
     plot=plot
   )
