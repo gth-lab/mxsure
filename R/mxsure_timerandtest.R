@@ -155,7 +155,7 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
 
   timerand_ci <- mxsure_ci(timerand_data$snp_dist, unrelated_snp_dist, timerand_data$time_dist, timerand_data$sites,
                                         bootstraps=bootstraps, confidence_level=confidence_level, right_truncation=right_truncation,
-                           tree=tree, sampleA=sampleA, sampleB=sampleB,branch_offset=branch_offset,
+                           tree=tree, sampleA=timerand_sampleA, sampleB=timerand_sampleB,branch_offset=branch_offset,
                                        lambda_bounds = lambda_bounds, k_bounds=k_bounds, intercept_bounds=intercept_bounds
                                        ,start_params = start_params_timerand
                                        )
