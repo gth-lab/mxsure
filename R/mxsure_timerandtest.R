@@ -193,7 +193,6 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
                            timerand_ci$raw_results %>% mutate(method = paste0("TR ", i)))
   }
 
-  return(timerand_ci)
 
   result$method <- factor(result$method, levels = result$method)
   rawtimerand$method <- factor(rawtimerand$method, levels = result$method)
@@ -243,6 +242,7 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
   xres_timerand <- list(
     result=result,
     raw_results=rawtimerand,
+    timerand_ci=timerand_ci,
     outcome=outcome,
     plot=plot
   )
