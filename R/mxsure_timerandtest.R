@@ -132,11 +132,6 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
         timerand_sampleA <- ifelse(p==1, sampleA, sampleB)
         timerand_sampleB <- ifelse(p==2, sampleA, sampleB)
 
-        print(p)
-        print(sampleA)
-        print(timerand_sampleA)
-        print(sampleB)
-        print(timerand_sampleB)
         return()
       }
 
@@ -169,6 +164,8 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
                                        lambda_bounds = lambda_bounds, k_bounds=k_bounds, intercept_bounds=intercept_bounds
                                        ,start_params = start_params_timerand
                                        )
+
+  return(timerand_ci)
 
   if(failure_criterion=="above_estimate"){
   p_value_n <- sum(timerand_ci$raw_results$lambda>=original_result$lambda)
