@@ -193,8 +193,7 @@ mxsure_likelihood <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dis
 
   LH <- LH |>
     mutate(rel_loglh = (
-      dpois(snp_dist, (
-        mix_res$lambda * (time_dist / 365.25) * felse(is.na(sites), 1, sites) + mix_res$intercept
+        mix_res$lambda * (time_dist / 365.25) * ifelse(is.na(sites), 1, sites) + mix_res$intercept
       ), log = TRUE) #/ ppois(right_truncation, (mix_res$lambda*(time_dist/365.25)*mean(mixed_sites)+mix_res$intercept))
     ),
     unrel_loglh = (
