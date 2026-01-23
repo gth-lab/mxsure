@@ -18,10 +18,8 @@
 #' @param k_bounds bounds of related proportion estimation
 #' @param intercept_bounds bounds of intercept estimation
 #' @param tree SNP-scaled phylogenetic tree or list of trees with pairs of tips labelled with sampleA and sampleB. If this is supplied a different model for related SNP distances will be fit that takes into account branch length differences to the MRCA for any given pair of samples provided in sampleA and sampleB.
-#' @param sampleA tip labels for sampleA; must be in the correct order with respect to sampleB such that the time distance is calculated as SampleA date-SampleB date (even if this allows for negative numbers)
-#' @param sampleB tip labels for sampleB;see above
-#' @param branch_offset overide to branch offset to each skellam parameter for divergence correction model
-#' @param tree_fulldist_param_bounds bounds of single branch fitting used in tree models
+#' @param sampleA tip labels for sampleA; must the earlier sampled branch
+#' @param sampleB tip labels for sampleB; must be the later sample branch
 #' @param original_result if supplied the function will not re-estimate the original estimate
 #'
 #' @importFrom tidyr tibble
@@ -56,7 +54,7 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
                                 bootstraps=100, permutations=5, quiet=FALSE, confidence_level=0.95,
                                 tree=NA, sampleA=NA, sampleB=NA,
                                 start_params='Efficient', original_result=NA, ci_data=NA, title=NULL,
-                                lambda_bounds = c(0, 1), k_bounds=c(0,1), intercept_bounds=c(-Inf, Inf),tree_fulldist_param_bounds = c(0, Inf), branch_offset=NA,
+                                lambda_bounds = c(0, 1), k_bounds=c(0,1), intercept_bounds=c(-Inf, Inf), alpha_bounds=c(1e-10, Inf), beta_bounds=c(1e-10, Inf),
                                 failure_criterion="above_estimate"
                                 ){
 
@@ -87,20 +85,20 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
   if(anyNA(original_result)){
     cat("Fitting base result")
   original_result <- mxsure_estimate(original_data$snp_dist,unrelated_snp_dist, original_data$time_dist,original_data$sites, right_truncation=right_truncation,
-                                     tree=tree, sampleA=sampleA, sampleB=sampleB, branch_offset=branch_offset, start_params=ifelse(all(start_params=="Efficient"), NA, start_params),
-                                     lambda_bounds = lambda_bounds, k_bounds=k_bounds, intercept_bounds=intercept_bounds, tree_fulldist_param_bounds = tree_fulldist_param_bounds)
+                                     tree=tree, sampleA=sampleA, sampleB=sampleB, start_params=ifelse(all(start_params=="Efficient"), NA, start_params),
+                                     lambda_bounds = lambda_bounds, k_bounds=k_bounds, intercept_bounds=intercept_bounds, alpha_bounds=alpha_bounds, beta_bounds=beta_bounds,)
   }
 
 
 
   if(anyNA(ci_data)){
     original_ci <- mxsure_ci(original_data$snp_dist,unrelated_snp_dist, original_data$time_dist,original_data$sites, right_truncation=right_truncation, quiet=quiet,
-                             tree=tree, sampleA=sampleA, sampleB=sampleB,branch_offset=branch_offset,
+                             tree=tree, sampleA=sampleA, sampleB=sampleB,
                                         bootstraps=bootstraps, confidence_level=confidence_level,
                                        start_params = ifelse(!anyNA(tree)|!anyNA(sampleA)|!anyNA(sampleB),
                                                              c(original_result[3], original_result[2],original_result[6], original_result[7]),
                                                              c(original_result[3], original_result[2], original_result[4])),
-                             lambda_bounds = lambda_bounds, k_bounds=k_bounds, intercept_bounds=intercept_bounds)
+                             lambda_bounds = lambda_bounds, k_bounds=k_bounds, intercept_bounds=intercept_bounds, alpha_bounds=alpha_bounds, beta_bounds=beta_bounds,)
   } else{
     original_ci <- ci_data
   }
@@ -148,8 +146,8 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
       }
 
   timerand_result <- mxsure_estimate(timerand_data$snp_dist,unrelated_snp_dist, timerand_data$time_dist, timerand_data$sites, right_truncation=right_truncation,
-                                     tree=tree, sampleA=timerand_sampleA, sampleB=timerand_sampleB, branch_offset=branch_offset,
-                                        lambda_bounds = lambda_bounds, k_bounds=k_bounds, intercept_bounds=intercept_bounds, start_params = start_params_timerand,  tree_fulldist_param_bounds = tree_fulldist_param_bounds)
+                                     tree=tree, sampleA=timerand_sampleA, sampleB=timerand_sampleB,
+                                        lambda_bounds = lambda_bounds, k_bounds=k_bounds, intercept_bounds=intercept_bounds, start_params = start_params_timerand,  alpha_bounds=alpha_bounds, beta_bounds=beta_bounds)
 
   if(!anyNA(start_params)){
   if (any(start_params=="Efficient")){
@@ -162,9 +160,9 @@ mxsure_timerandtest <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_d
 
   timerand_ci <- mxsure_ci(timerand_data$snp_dist, unrelated_snp_dist, timerand_data$time_dist, timerand_data$sites,
                                         bootstraps=bootstraps, confidence_level=confidence_level, right_truncation=right_truncation,
-                              tree=tree, sampleA=timerand_sampleA, sampleB=timerand_sampleB, branch_offset=branch_offset,
+                              tree=tree, sampleA=timerand_sampleA, sampleB=timerand_sampleB,
                                        lambda_bounds = lambda_bounds, k_bounds=k_bounds, intercept_bounds=intercept_bounds
-                                       ,start_params = start_params_timerand
+                                       ,start_params = start_params_timerand, alpha_bounds=alpha_bounds, beta_bounds=beta_bounds,
                                        )
 
 

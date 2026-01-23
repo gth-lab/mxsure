@@ -10,18 +10,18 @@ mxsure_estimate(
   mixed_time_dist = NA,
   mixed_sites = NA,
   right_truncation = 2000,
-  threshold_time = NA,
+  threshold_time = 3 * 365,
   youden = FALSE,
   threshold_range = FALSE,
   tree = NA,
   sampleA = NA,
   sampleB = NA,
   return_tree_data = FALSE,
-  branch_offset = NA,
   lambda_bounds = c(0, 1),
   k_bounds = c(0, 1),
-  intercept_bounds = c(0, Inf),
-  tree_fulldist_param_bounds = c(0, Inf),
+  intercept_bounds = c(-Inf, Inf),
+  alpha_bounds = c(1e-10, Inf),
+  beta_bounds = c(1e-10, Inf),
   upper.tail = 0.95,
   max_false_positive = 0.05,
   start_params = NA,
@@ -39,7 +39,7 @@ mxsure_estimate(
 
 \item{right_truncation}{a SNP distance limit for the data, if set to NA will estimate as if there is no limit. Will be faster with a lower truncation point.}
 
-\item{threshold_time}{the time (in days) utilised to calculate SNP thresholds, only applicable when time differences are provided, if not provided will utilise maximum of supplied times}
+\item{threshold_time}{the time (in days) utilised to calculate SNP thresholds, only applicable when time differences are provided and by default 3 years. If NA provided will utilise maximum of supplied times}
 
 \item{youden}{whether to produce additional SNP thresholds using the Youden method}
 
@@ -47,21 +47,17 @@ mxsure_estimate(
 
 \item{tree}{SNP-scaled phylogenetic tree or list of trees with pairs of tips labelled with sampleA and sampleB. If this is supplied a different model for related SNP distances will be fit that takes into account branch length differences to the MRCA for any given pair of samples provided in sampleA and sampleB.}
 
-\item{sampleA}{tip labels for sampleA; must be in the correct order with respect to sampleB such that the time distance is calculated as SampleA date-SampleB date (even if this allows for negative numbers)}
+\item{sampleA}{tip labels for sampleA; must the earlier sampled branch}
 
-\item{sampleB}{tip labels for sampleB;see above}
+\item{sampleB}{tip labels for sampleB; must be the later sample branch}
 
 \item{return_tree_data}{return data used for tree models instead of fitting model}
-
-\item{branch_offset}{overide to branch offset to each skellam parameter for divergence correction model}
 
 \item{lambda_bounds}{bounds of rate estimation in SNPs/year/site if given time and site data}
 
 \item{k_bounds}{bounds of related proportion estimation}
 
 \item{intercept_bounds}{bounds of intercept estimation}
-
-\item{tree_fulldist_param_bounds}{bounds of single branch fitting used in tree models}
 
 \item{upper.tail}{percentile to calculate SNP thresholds}
 

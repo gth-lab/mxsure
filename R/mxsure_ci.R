@@ -15,10 +15,8 @@
 #' @param k_bounds bounds of related proportion estimation
 #' @param intercept_bounds bounds of intercept estimation
 #' @param tree SNP-scaled phylogenetic tree or list of trees with pairs of tips labelled with sampleA and sampleB. If this is supplied a different model for related SNP distances will be fit that takes into account branch length differences to the MRCA for any given pair of samples provided in sampleA and sampleB.
-#' @param sampleA tip labels for sampleA; must be in the correct order with respect to sampleB such that the time distance is calculated as SampleA date-SampleB date (even if this allows for negative numbers)
-#' @param sampleB tip labels for sampleB;see above
-#' @param branch_offset overide to branch offset to each skellam parameter for divergence correction model
-#' @param tree_fulldist_param_bounds bounds of single branch fitting used in tree models
+#' @param sampleA tip labels for sampleA; must the earlier sampled branch
+#' @param sampleB tip labels for sampleB; must be the later sample branch
 #' @param quiet if true will not display progress bar
 #'
 #' @importFrom furrr future_map_dfr furrr_options
@@ -44,7 +42,7 @@
 mxsure_ci <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist=NA, mixed_sites=NA,
                       sample_size=length(mixed_snp_dist),right_truncation=NA, bootstraps=100, confidence_level=0.95, start_params="Efficient",
                       tree=NA, sampleA=NA, sampleB=NA,
-                      lambda_bounds = c(0, 1), k_bounds=c(0,1), intercept_bounds=c(-Inf, Inf), tree_fulldist_param_bounds = c(0, Inf), branch_offset=NA,
+                      lambda_bounds = c(0, 1), k_bounds=c(0,1), intercept_bounds=c(-Inf, Inf), alpha_bounds=c(1e-10, Inf), beta_bounds=c(1e-10, Inf),
                       quiet=FALSE){
 
   snp_dist <-NULL
@@ -78,9 +76,8 @@ mxsure_ci <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist=NA, mi
   test_result <- suppressWarnings(
       mxsure_estimate(
         mix_data$snp_dist,unrelated_snp_dist, mix_data$time_dist, mix_data$sites, right_truncation=right_truncation, start_params = NA,
-        tree=tree, sampleA=mix_data$sampleA, sampleB=mix_data$sampleB, branch_offset=branch_offset,
-        lambda_bounds = lambda_bounds, k_bounds=k_bounds,  intercept_bounds=intercept_bounds,
-        tree_fulldist_param_bounds = tree_fulldist_param_bounds)
+        tree=tree, sampleA=mix_data$sampleA, sampleB=mix_data$sampleB, alpha_bounds=alpha_bounds, beta_bounds=beta_bounds,
+        lambda_bounds = lambda_bounds, k_bounds=k_bounds,  intercept_bounds=intercept_bounds)
   , classes = "warning")
   if(!anyNA(tree)|!anyNA(sampleA)|!anyNA(sampleB)){
   start_params <- as.numeric(c(test_result[3], test_result[2], test_result[6], test_result[7]))
@@ -97,8 +94,8 @@ mxsure_ci <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist=NA, mi
   suppressWarnings(
     mxsure_estimate(
       x$snp_dist, y, x$time_dist, x$sites, right_truncation=right_truncation,
-      tree=tree, sampleA=x$sampleA, sampleB=x$sampleB, branch_offset=branch_offset,
-      start_params = start_params, lambda_bounds = lambda_bounds, k_bounds=k_bounds, intercept_bounds=intercept_bounds, tree_fulldist_param_bounds = tree_fulldist_param_bounds
+      tree=tree, sampleA=x$sampleA, sampleB=x$sampleB,
+      start_params = start_params, lambda_bounds = lambda_bounds, k_bounds=k_bounds, intercept_bounds=intercept_bounds, alpha_bounds=alpha_bounds, beta_bounds=beta_bounds,
     )
   , classes = "warning")
   ,data.frame(snp_threshold=NA, lambda=NA, k=NA,intercept=NA, estimated_fp=NA))

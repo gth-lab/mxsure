@@ -24,8 +24,8 @@ mxsure_timerandtest(
   lambda_bounds = c(0, 1),
   k_bounds = c(0, 1),
   intercept_bounds = c(-Inf, Inf),
-  tree_fulldist_param_bounds = c(0, Inf),
-  branch_offset = NA,
+  alpha_bounds = c(1e-10, Inf),
+  beta_bounds = c(1e-10, Inf),
   failure_criterion = "above_estimate"
 )
 }
@@ -50,9 +50,9 @@ mxsure_timerandtest(
 
 \item{tree}{SNP-scaled phylogenetic tree or list of trees with pairs of tips labelled with sampleA and sampleB. If this is supplied a different model for related SNP distances will be fit that takes into account branch length differences to the MRCA for any given pair of samples provided in sampleA and sampleB.}
 
-\item{sampleA}{tip labels for sampleA; must be in the correct order with respect to sampleB such that the time distance is calculated as SampleA date-SampleB date (even if this allows for negative numbers)}
+\item{sampleA}{tip labels for sampleA; must the earlier sampled branch}
 
-\item{sampleB}{tip labels for sampleB;see above}
+\item{sampleB}{tip labels for sampleB; must be the later sample branch}
 
 \item{start_params}{initial parameters for bootstrap estimates, if NA will try various different start parameters and produce the highest likelihood result. Specifying the start parameters minimises computing time. If "Efficient" (as default) will use original result as starting paramters.}
 
@@ -67,10 +67,6 @@ mxsure_timerandtest(
 \item{k_bounds}{bounds of related proportion estimation}
 
 \item{intercept_bounds}{bounds of intercept estimation}
-
-\item{tree_fulldist_param_bounds}{bounds of single branch fitting used in tree models}
-
-\item{branch_offset}{overide to branch offset to each skellam parameter for divergence correction model}
 
 \item{failure_criterion}{proportion of bootstraps either "above_estimate", "above_low_ci", or "within_ci"}
 }

@@ -10,9 +10,8 @@
 #' @param original_result optional input to provide original mxsure_likelyhood() result instead of computing it again
 #' @param start_params initial parameters for lambda, k, and intercept parameters for optimisation. If NA (as default) will try a range of different start parameters and produce the highest likelihood result
 #' @param tree SNP-scaled phylogenetic tree or list of trees with pairs of tips labelled with sampleA and sampleB. If this is supplied a different model for related SNP distances will be fit that takes into account branch length differences to the MRCA for any given pair of samples provided in sampleA and sampleB.
-#' @param sampleA tip labels for sampleA; must be in the correct order with respect to sampleB such that the time distance is calculated as SampleA date-SampleB date (even if this allows for negative numbers)
-#' @param sampleB tip labels for sampleB; see above
-#' @param branch_offset overide to branch offset to each skellam parameter for divergence correction model
+#' @param sampleA tip labels for sampleA; must the earlier sampled branch
+#' @param sampleB tip labels for sampleB; must be the later sample branch
 #'
 #' @importFrom dplyr distinct mutate
 #' @importFrom tidyr tibble
@@ -34,7 +33,7 @@
 #'
 #' @export
 mxsure_likelihood <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist, mixed_sites=NA, right_truncation=2000,original_result=NA,start_params=NA,
-                              tree=NA, sampleA=NA, sampleB=NA,  branch_offset=NA){
+                              tree=NA, sampleA=NA, sampleB=NA){
 
   snp_dist<- time_dist<- rel_loglh<- unrel_loglh<- logLHR <-  NULL
 
@@ -45,8 +44,8 @@ mxsure_likelihood <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dis
   unrelated_snp_dist <- unrelated_snp_dist[unrelated_snp_dist<right_truncation]
 
   if(anyNA(original_result)){
-  mix_res <- suppressWarnings(mxsure_estimate(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist, mixed_sites, right_truncation = 2000,start_params=start_params,
-                                              tree=tree, sampleA=sampleA, sampleB=sampleB, branch_offset=branch_offset))
+  mix_res <- suppressWarnings(mxsure_estimate(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist, mixed_sites, right_truncation = right_truncation, start_params=start_params,
+                                              tree=tree, sampleA=sampleA, sampleB=sampleB))
   }else{
   mix_res <- original_result
 }
@@ -77,20 +76,22 @@ mxsure_likelihood <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dis
 
           mrca_to_tip1 <- edge_dist[mrca_node, tip1_node]
           mrca_to_tip2 <- edge_dist[mrca_node, tip2_node]
-          root_to_mrca <- phytools::fastHeight(tree_i, tip1, tip2)
+          #root_to_mrca <- phytools::fastHeight(tree_i, tip1, tip2)
           #shared_snps <- min(mrca_to_tip1, mrca_to_tip2)
 
           #if (distance_since_sample<0  ) return(NA)
           #if( full_distance / distance_since_sample > max_correction_factor) return(NA)
 
-          return(tibble(mrca_to_tip1=mrca_to_tip1, mrca_to_tip2=mrca_to_tip2, root_to_mrca=root_to_mrca))  #shared_snps) #time_diff * full_distance / distance_since_sample)
+          return(tibble(mrca_to_tip1=mrca_to_tip1, mrca_to_tip2=mrca_to_tip2#, root_to_mrca=root_to_mrca
+                        ))  #shared_snps) #time_diff * full_distance / distance_since_sample)
         }
       }
       # If no matching tree or MRCA, return original time
-      return(tibble(mrca_to_tip1=NA, mrca_to_tip2=NA, root_to_mrca=NA))
+      return(tibble(mrca_to_tip1=NA, mrca_to_tip2=NA#, root_to_mrca=NA
+                    )
+             )
     }
 
-    # Vectorised using pmap
     branch_lengths <- purrr::pmap_dfr(
       list(sampleA, sampleB, mixed_snp_dist, mixed_time_dist),
       compute_shared_snps
@@ -101,14 +102,45 @@ mxsure_likelihood <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dis
     #   max_time <- max(mixed_time_dist)
     # }
 
+    dlogpoissongamma <- function(x, y, dt, lambda, sites, alpha, beta) {
+
+      K <- lambda * dt * sites
+
+      # Constants
+      log_denom_base <- log(2 + beta)
+      log_const <- -K + alpha * log(beta) - lfactorial(x) - lfactorial(y) - lgamma(alpha)
+
+      # 1. OPTIMIZATION: If K is effectively 0, the binomial sum collapses
+      # to a single term (where j=y). This avoids vector allocation.
+      if (K <= 1e-9) {
+        return(log_const + lgamma(x + alpha + y) - (x + alpha + y) * log_denom_base)
+      }
+
+      # 2. VECTORIZATION: Calculate all j terms at once
+      j <- 0:y
+
+      # log( binomial(y,j) * K^(y-j) * Gamma(...) / Base^(...) )
+      # We use (y-j) * log(K). Since we handled K~0 above, log(K) is safe.
+      log_terms <- lchoose(y, j) +
+        (y - j) * log(K) +
+        lgamma(x + alpha + j) -
+        (x + alpha + j) * log_denom_base
+
+      # 3. FAST LOG-SUM-EXP
+      max_val <- max(log_terms)
+      log_sum <- max_val + log(sum(exp(log_terms - max_val)))
+
+      return(log_const + log_sum)
+    }
+
     mixed_snp_dist <- mixed_snp_dist[!anyNA(branch_lengths)]
     mixed_time_dist <- mixed_time_dist[!anyNA(branch_lengths)]
     mixed_sites <- mixed_sites[!anyNA(branch_lengths)]
     sampleA <- sampleA[!anyNA(branch_lengths)]
     sampleB <- sampleB[!anyNA(branch_lengths)]
-    if(!is.na(branch_offset)){
-      branch_lengths$root_to_mrca <- branch_offset
-    }
+    # if(!is.na(branch_offset)){
+    #   branch_lengths$root_to_mrca <- branch_offset
+    # }
 
     LH <-  distinct(
       tibble(
@@ -116,25 +148,16 @@ mxsure_likelihood <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dis
         time_dist = mixed_time_dist,
         sites = mixed_sites,
         mrca_to_tip1 = branch_lengths$mrca_to_tip1,
-        mrca_to_tip2 = branch_lengths$mrca_to_tip2,
-        root_to_mrca = branch_lengths$root_to_mrca
+        mrca_to_tip2 = branch_lengths$mrca_to_tip2#,
+        #root_to_mrca = branch_lengths$root_to_mrca
       )
     )
 
     LH <- LH |>
       rowwise()|>
       mutate(rel_loglh = (
-        skellam::dskellam(mrca_to_tip1 - mrca_to_tip2,
-          (mix_res$lambda * (time_dist / 365.25) * sites )+ mix_res$intercept + mrca_to_tip2 + root_to_mrca,
-          mrca_to_tip2+ root_to_mrca,
-          log = TRUE) +
-          dpois(x = mrca_to_tip1,
-                lambda = mix_res$tree_fulldist_param,
-                log=TRUE)+
-          dpois(x = mrca_to_tip2,
-                lambda = mix_res$tree_fulldist_param,
-                log=TRUE)
-      ),
+        exp(
+          dlogpoissongamma(mrca_to_tip1, mrca_to_tip2, time_dist, mix_res$lambda, ifelse(is.na(sites), 1, sites) , mix_res$alpha, mix_res$beta))),
       unrel_loglh = (
         dnbinom(
           snp_dist,
@@ -147,7 +170,7 @@ mxsure_likelihood <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dis
           size = mix_res$nb_size,
           log.p = TRUE
         )
-      )) |>
+      ))|>
       mutate(logLHR = (rel_loglh - unrel_loglh)) |>
       mutate(
         rel_lh = exp(rel_loglh),
@@ -159,7 +182,7 @@ mxsure_likelihood <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dis
     return(LH)
 
 #### non tree likelihood #####
-}else{
+} else {
   LH <-
     tibble(
       snp_dist = mixed_snp_dist,
@@ -171,7 +194,7 @@ mxsure_likelihood <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dis
   LH <- LH |>
     mutate(rel_loglh = (
       dpois(snp_dist, (
-        mix_res$lambda * (time_dist / 365.25) * sites + mix_res$intercept
+        mix_res$lambda * (time_dist / 365.25) * felse(is.na(sites), 1, sites) + mix_res$intercept
       ), log = TRUE) #/ ppois(right_truncation, (mix_res$lambda*(time_dist/365.25)*mean(mixed_sites)+mix_res$intercept))
     ),
     unrel_loglh = (

@@ -14,8 +14,7 @@ mxsure_likelihood(
   start_params = NA,
   tree = NA,
   sampleA = NA,
-  sampleB = NA,
-  branch_offset = NA
+  sampleB = NA
 )
 }
 \arguments{
@@ -35,11 +34,9 @@ mxsure_likelihood(
 
 \item{tree}{SNP-scaled phylogenetic tree or list of trees with pairs of tips labelled with sampleA and sampleB. If this is supplied a different model for related SNP distances will be fit that takes into account branch length differences to the MRCA for any given pair of samples provided in sampleA and sampleB.}
 
-\item{sampleA}{tip labels for sampleA; must be in the correct order with respect to sampleB such that the time distance is calculated as SampleA date-SampleB date (even if this allows for negative numbers)}
+\item{sampleA}{tip labels for sampleA; must the earlier sampled branch}
 
-\item{sampleB}{tip labels for sampleB; see above}
-
-\item{branch_offset}{overide to branch offset to each skellam parameter for divergence correction model}
+\item{sampleB}{tip labels for sampleB; must be the later sample branch}
 }
 \value{
 a dataframe with SNP distances, time differences, sites considered and the likeyhoods of related and unrelated models fitting for each datapoint
