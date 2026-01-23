@@ -156,8 +156,7 @@ mxsure_likelihood <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dis
     LH <- LH |>
       rowwise()|>
       mutate(rel_loglh = (
-        exp(
-          dlogpoissongamma(mrca_to_tip1, mrca_to_tip2, time_dist, mix_res$lambda, ifelse(is.na(sites), 1, sites) , mix_res$alpha, mix_res$beta))),
+          dlogpoissongamma(mrca_to_tip1, mrca_to_tip2, (time_dist / 365.25), mix_res$lambda, sites, mix_res$alpha, mix_res$beta)),
       unrel_loglh = (
         dnbinom(
           snp_dist,
@@ -193,7 +192,7 @@ mxsure_likelihood <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dis
 
   LH <- LH |>
     mutate(rel_loglh = (
-        mix_res$lambda * (time_dist / 365.25) * ifelse(is.na(sites), 1, sites) + mix_res$intercept
+      dpois((  mix_res$lambda * (time_dist / 365.25) * sites + mix_res$intercept
       ), log = TRUE) #/ ppois(right_truncation, (mix_res$lambda*(time_dist/365.25)*mean(mixed_sites)+mix_res$intercept))
     ),
     unrel_loglh = (
