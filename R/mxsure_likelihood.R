@@ -46,6 +46,7 @@ mxsure_likelihood <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dis
   if(anyNA(original_result)){
   mix_res <- suppressWarnings(mxsure_estimate(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist, mixed_sites, right_truncation = right_truncation, start_params=start_params,
                                               tree=tree, sampleA=sampleA, sampleB=sampleB))
+
   }else{
   mix_res <- original_result
 }
@@ -192,7 +193,8 @@ mxsure_likelihood <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dis
 
   LH <- LH |>
     mutate(rel_loglh = (
-      dpois((  mix_res$lambda * (time_dist / 365.25) * sites + mix_res$intercept
+      dpois(snp_dist,
+            (  mix_res$lambda * (time_dist / 365.25) * sites + mix_res$intercept
       ), log = TRUE) #/ ppois(right_truncation, (mix_res$lambda*(time_dist/365.25)*mean(mixed_sites)+mix_res$intercept))
     ),
     unrel_loglh = (

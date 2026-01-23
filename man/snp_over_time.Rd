@@ -22,10 +22,11 @@ snp_over_time(
   tree = NA,
   sampleA = NA,
   sampleB = NA,
-  branch_offset = NA,
   lambda_bounds = c(0, 1),
   k_bounds = c(0, 1),
-  intercept_bounds = c(-Inf, Inf)
+  intercept_bounds = c(-Inf, Inf),
+  alpha_bounds = c(1e-10, Inf),
+  beta_bounds = c(1e-10, Inf)
 )
 }
 \arguments{
@@ -59,17 +60,19 @@ snp_over_time(
 
 \item{tree}{SNP-scaled phylogenetic tree or list of trees with pairs of tips labelled with sampleA and sampleB. If this is supplied a different model for related SNP distances will be fit that takes into account branch length differences to the MRCA for any given pair of samples provided in sampleA and sampleB.}
 
-\item{sampleA}{tip labels for sampleA; must be in the correct order with respect to sampleB such that the time distance is calculated as SampleA date-SampleB date (even if this allows for negative numbers)}
+\item{sampleA}{tip labels for sampleA; must the earlier sampled branch}
 
-\item{sampleB}{tip labels for sampleB; see above}
-
-\item{branch_offset}{overide to branch offset to each skellam parameter for divergence correction model}
+\item{sampleB}{tip labels for sampleB; must be the later sample branch}
 
 \item{lambda_bounds}{bounds of rate estimation in SNPs/year/site if given time and site data}
 
 \item{k_bounds}{bounds of related proportion estimation}
 
 \item{intercept_bounds}{bounds of intercept estimation}
+
+\item{alpha_bounds}{bounds for alpha paramter in phylo model}
+
+\item{beta_bounds}{bounds for beta paramter in phylo model}
 }
 \value{
 a plot of SNP distance over time using ggplot

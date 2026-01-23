@@ -56,6 +56,10 @@ mxsure_ci(
 
 \item{intercept_bounds}{bounds of intercept estimation}
 
+\item{alpha_bounds}{bounds for alpha paramter in phylo model}
+
+\item{beta_bounds}{bounds for beta paramter in phylo model}
+
 \item{quiet}{if true will not display progress bar}
 }
 \value{

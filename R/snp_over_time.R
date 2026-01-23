@@ -17,12 +17,13 @@
 #' @param original_result optional input to provide original mxsure_likelyhood() result instead of computing it again
 #' @param start_params initial parameters for lambda, k, and intercept parameters for optimisation. If NA (as default) will try a range of different start parameters and produce the highest likelihood result
 #' @param tree SNP-scaled phylogenetic tree or list of trees with pairs of tips labelled with sampleA and sampleB. If this is supplied a different model for related SNP distances will be fit that takes into account branch length differences to the MRCA for any given pair of samples provided in sampleA and sampleB.
-#' @param sampleA tip labels for sampleA; must be in the correct order with respect to sampleB such that the time distance is calculated as SampleA date-SampleB date (even if this allows for negative numbers)
-#' @param sampleB tip labels for sampleB; see above
-#' @param branch_offset overide to branch offset to each skellam parameter for divergence correction model
+#' @param sampleA tip labels for sampleA; must the earlier sampled branch
+#' @param sampleB tip labels for sampleB; must be the later sample branch
 #' @param lambda_bounds bounds of rate estimation in SNPs/year/site if given time and site data
 #' @param k_bounds bounds of related proportion estimation
 #' @param intercept_bounds bounds of intercept estimation
+#' @param alpha_bounds bounds for alpha paramter in phylo model
+#' @param beta_bounds bounds for beta paramter in phylo model
 #'
 #' @importFrom ggplot2 ggplot aes scale_y_continuous scale_x_continuous scale_color_manual geom_point geom_step geom_hline labs theme_minimal guides guide_legend scale_linetype_manual
 #' @importFrom dplyr distinct mutate recode rowwise
@@ -48,8 +49,8 @@
 #' @export
 snp_over_time <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist, mixed_sites=NA, right_truncation=2000, original_result=NA, start_params=NA,
                           threshold_time=NA, title="SNP Distance Over Time", jitter=TRUE, failure_perc=NA, ci_data=NA, time_limits=c(0,NA), under_threshold=FALSE,
-                          tree=NA, sampleA=NA, sampleB=NA,branch_offset=NA,
-                          lambda_bounds=c(0, 1), k_bounds=c(0,1), intercept_bounds=c(-Inf, Inf)){
+                          tree=NA, sampleA=NA, sampleB=NA,
+                          lambda_bounds=c(0, 1), k_bounds=c(0,1), intercept_bounds=c(-Inf, Inf), alpha_bounds=c(1e-10, Inf), beta_bounds=c(1e-10, Inf)){
 
 
   snp_dist <- time_dist <-rel_lh <- unrel_lh <-LHR <-LHR_bin <- result <- estimate <- low_ci <- high_ci <- rel_loglh <- unrel_logLH <- logLH <- NULL
@@ -60,14 +61,14 @@ snp_over_time <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist, m
 
   data <- mxsure_likelihood(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist, mixed_sites, right_truncation =
                               right_truncation, original_result = original_result, start_params = start_params, tree =
-                              tree, sampleA = sampleA, sampleB = sampleB, branch_offset = branch_offset)
+                              tree, sampleA = sampleA, sampleB = sampleB)
 
   data$time_dist <- abs(data$time_dist)
 
 
 if(anyNA(original_result)){
   mix_res <- suppressWarnings(mxsure_estimate(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist, mixed_sites, right_truncation = 2000, start_params=start_params,
-                                              tree=tree, sampleA=sampleA, sampleB=sampleB, branch_offset=branch_offset))
+                                              tree=tree, sampleA=sampleA, sampleB=sampleB))
 }else{
   mix_res <- original_result
 }

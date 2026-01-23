@@ -21,6 +21,8 @@
 #' @param sampleA tip labels for sampleA; must the earlier sampled branch
 #' @param sampleB tip labels for sampleB; must be the later sample branch
 #' @param original_result if supplied the function will not re-estimate the original estimate
+#' @param alpha_bounds bounds for alpha paramter in phylo model
+#' @param beta_bounds bounds for beta paramter in phylo model
 #'
 #' @importFrom tidyr tibble
 #' @importFrom dplyr mutate group_by ungroup bind_rows slice_sample

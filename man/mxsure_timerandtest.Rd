@@ -68,6 +68,10 @@ mxsure_timerandtest(
 
 \item{intercept_bounds}{bounds of intercept estimation}
 
+\item{alpha_bounds}{bounds for alpha paramter in phylo model}
+
+\item{beta_bounds}{bounds for beta paramter in phylo model}
+
 \item{failure_criterion}{proportion of bootstraps either "above_estimate", "above_low_ci", or "within_ci"}
 }
 \value{

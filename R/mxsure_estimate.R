@@ -21,6 +21,8 @@
 #' @param sampleA tip labels for sampleA; must the earlier sampled branch
 #' @param sampleB tip labels for sampleB; must be the later sample branch
 #' @param return_tree_data return data used for tree models instead of fitting model
+#' @param alpha_bounds bounds for alpha paramter in phylo model
+#' @param beta_bounds bounds for beta paramter in phylo model
 #'
 #' @importFrom stats qpois rnbinom nlminb var
 #' @importFrom dplyr filter

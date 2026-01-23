@@ -18,6 +18,8 @@
 #' @param sampleA tip labels for sampleA; must the earlier sampled branch
 #' @param sampleB tip labels for sampleB; must be the later sample branch
 #' @param quiet if true will not display progress bar
+#' @param alpha_bounds bounds for alpha paramter in phylo model
+#' @param beta_bounds bounds for beta paramter in phylo model
 #'
 #' @importFrom furrr future_map_dfr furrr_options
 #' @importFrom dplyr bind_rows summarise across everything slice_sample select

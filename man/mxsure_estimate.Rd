@@ -59,6 +59,10 @@ mxsure_estimate(
 
 \item{intercept_bounds}{bounds of intercept estimation}
 
+\item{alpha_bounds}{bounds for alpha paramter in phylo model}
+
+\item{beta_bounds}{bounds for beta paramter in phylo model}
+
 \item{upper.tail}{percentile to calculate SNP thresholds}
 
 \item{max_false_positive}{if the false positive rate from calculated threshold is higher than this value a warning is produced}
