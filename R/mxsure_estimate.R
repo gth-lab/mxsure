@@ -494,7 +494,7 @@ mxsure_estimate <- function(mixed_snp_dist, unrelated_snp_dist, mixed_time_dist=
         }
         else{
           start_params[2] <- (as.numeric(start_params[2])*1e6)/(365.25)
-          result <- nlminb(start=start_params, objective=llk3, x = mixed_snp_dist, t = mixed_time_dist, s = mixed_sites, c1 = branch_lengths$mrca_to_tip1, c2 = branch_lengths$mrca_to_tip2,b = branch_lengths$root_to_mrca,# method="SANN",
+          result <- nlminb(start=start_params, objective=llk3, x = mixed_snp_dist, t = mixed_time_dist, s = mixed_sites, c1 = branch_lengths$mrca_to_tip1, c2 = branch_lengths$mrca_to_tip2,
                            lower = c(k_bounds[1], lambda_bounds[1], alpha_bounds[1] ,beta_bounds[1]),
                            upper = c(k_bounds[2], lambda_bounds[2], alpha_bounds[2] ,beta_bounds[2]),
                            control = list(trace = trace))
