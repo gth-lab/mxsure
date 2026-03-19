@@ -1,0 +1,26 @@
+name: Sync from Public Repo
+on:
+  # This triggers the sync every hour (adjust as needed)
+  schedule:
+    - cron: '0 * * * *'
+  # This allows you to trigger it manually via the "Actions" tab
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Private Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Pull changes from Public Repo
+        run: |
+          git remote add public https://github.com/zunairkhm/mxsure
+          git fetch public
+          # Merges public main into private main
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git merge public/master --allow-unrelated-histories -m "Syncing from public repo"
+          git push origin master
